@@ -1,7 +1,7 @@
 #!/bin/bash
-source ../lib/ui.sh
+source /lib/ui.sh
 
-title "Mounting Partitions"
+echo: "-----Mounting Partitions-----"
 
 ROOT_PART=$(cat /tmp/enux-root)
 mount "$ROOT_PART" /mnt
