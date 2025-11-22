@@ -1,7 +1,7 @@
 #!/bin/bash
-source ../lib/ui.sh
+source /lib/ui.sh
 
-title "Installing GRUB Bootloader"
+echo "-----Installing GRUB Bootloader-----"
 
 # Detect which disk to install GRUB to
 DISK=$(cat /tmp/enux-root | sed 's/[0-9]*$//') # strip partition number
