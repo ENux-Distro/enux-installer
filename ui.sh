@@ -15,7 +15,7 @@ title() {
     line
 }
 
-# Simple menu function (if you want options later)
+# Simple menu function (optional)
 menu() {
     local prompt="$1"
     shift
