@@ -1,5 +1,5 @@
 #!/bin/bash
-source ../lib/ui.sh
+source /lib/ui.sh
 
 title "Guided Partitioning"
 
