@@ -1,7 +1,7 @@
 #!/bin/bash
-source ../lib/ui.sh
+source /lib/ui.sh
 
-title "Installing Base System"
+echo "-----Installing Base System-----"
 
 echo "Installing minimal Debian system to /mnt..."
 read -p "Press ENTER to continue..."
