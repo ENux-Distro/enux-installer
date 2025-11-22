@@ -13,14 +13,26 @@ mount --rbind /sys /mnt/sys
 mount --rbind /dev /mnt/dev
 mount --rbind /run /mnt/run
 
-# Install GRUB (handles BIOS/UEFI if grub-pc/efi is installed)
-chroot /mnt /bin/bash -c "
-apt update
-apt install -y grub-pc grub-efi
-grub-install $DISK
-update-grub
-"
+# Detect UEFI vs BIOS
+if [ -d /mnt/sys/firmware/efi ]; then
+    echo "UEFI detected. Installing grub-efi..."
+    chroot /mnt /bin/bash -c "
+        apt update
+        apt install -y grub-efi
+        grub-install $DISK
+        update-grub
+    "
+else
+    echo "BIOS detected. Installing grub-pc..."
+    chroot /mnt /bin/bash -c "
+        apt update
+        apt install -y grub-pc
+        grub-install $DISK
+        update-grub
+    "
+fi
 
 echo "GRUB installation complete."
 read -p "Press ENTER to continue..."
+
 
