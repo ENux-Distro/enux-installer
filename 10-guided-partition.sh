@@ -1,7 +1,7 @@
 #!/bin/bash
 source /lib/ui.sh
 
-title "Guided Partitioning"
+echo "-----Guided Partitioning-----"
 
 echo "Available disks:"
 lsblk -d -o NAME,SIZE
