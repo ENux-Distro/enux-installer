@@ -1,8 +1,7 @@
 #!/bin/bash
-source /lib/ui.sh
+source "$(dirname "$0")/ui.sh"
 
 echo "-----Installing Base System-----"
-
 echo "Installing minimal Debian system to /mnt..."
 read -p "Press ENTER to continue..."
 
@@ -13,7 +12,7 @@ if ! command -v debootstrap &>/dev/null; then
     apt install -y debootstrap
 fi
 
-# Run debootstrap
+# Run debootstrap for Debian stable amd64
 debootstrap --arch amd64 stable /mnt http://deb.debian.org/debian/
 
 echo "Base system installed."
