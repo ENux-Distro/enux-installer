@@ -2,13 +2,14 @@
 # Ensure flat repo: ui.sh in same folder
 source "$(dirname "$0")/ui.sh"
 
-echo "----- Guided Partitioning -----"
+echo "-----Guided Partitioning-----"
 
 # List available disks
 echo "Available disks:"
-lsblk -d -o NAME,SIZE
+/usr/bin/lsblk -d -o NAME,SIZE
 echo ""
 
+# Ask for installation disk
 read -p "Enter the disk to install ENux on (e.g., /dev/sda): " INSTALL_DISK
 
 # Validate disk
@@ -26,43 +27,42 @@ if [ "$CONFIRM" != "YES" ]; then
 fi
 
 echo "Wiping $INSTALL_DISK..."
-wipefs -a "$INSTALL_DISK"
-parted -s "$INSTALL_DISK" mklabel gpt
+/usr/sbin/wipefs -a "$INSTALL_DISK"
+/usr/sbin/parted -s "$INSTALL_DISK" mklabel gpt
 
 # Detect UEFI
 EFI_PART=""
 if [ -d /sys/firmware/efi ]; then
     echo "UEFI detected. Creating 1GB EFI partition..."
-    parted -s "$INSTALL_DISK" mkpart ESP fat32 1MiB 1025MiB
-    parted -s "$INSTALL_DISK" set 1 esp on
+    /usr/sbin/parted -s "$INSTALL_DISK" mkpart ESP fat32 1MiB 1025MiB
+    /usr/sbin/parted -s "$INSTALL_DISK" set 1 esp on
     EFI_PART="${INSTALL_DISK}1"
 fi
 
 # Swap (10GB)
 START_SWAP=1025
 END_SWAP=$((START_SWAP + 10240))
-parted -s "$INSTALL_DISK" mkpart primary linux-swap ${START_SWAP}MiB ${END_SWAP}MiB
+/usr/sbin/parted -s "$INSTALL_DISK" mkpart primary linux-swap ${START_SWAP}MiB ${END_SWAP}MiB
 SWAP_PART="${INSTALL_DISK}2"
 
 # Root partition (rest of disk)
-ROOT_START=$((END_SWAP))
-parted -s "$INSTALL_DISK" mkpart primary ext4 ${ROOT_START}MiB 100%
+/usr/sbin/parted -s "$INSTALL_DISK" mkpart primary ext4 ${END_SWAP}MiB 100%
 ROOT_PART="${INSTALL_DISK}3"
 
 # Format partitions
-[ -n "$EFI_PART" ] && mkfs.fat -F32 "$EFI_PART"
-mkswap "$SWAP_PART"
-mkfs.ext4 "$ROOT_PART"
+[ -n "$EFI_PART" ] && /usr/sbin/mkfs.fat -F32 "$EFI_PART"
+/usr/sbin/mkswap "$SWAP_PART"
+/usr/sbin/mkfs.ext4 "$ROOT_PART"
 
 # Mount partitions
-mount "$ROOT_PART" /mnt
-[ -n "$EFI_PART" ] && mkdir -p /mnt/boot/efi && mount "$EFI_PART" /mnt/boot/efi
-swapon "$SWAP_PART"
+/usr/sbin/mount "$ROOT_PART" /mnt
+[ -n "$EFI_PART" ] && /usr/sbin/mkdir -p /mnt/boot/efi && /usr/sbin/mount "$EFI_PART" /mnt/boot/efi
+/usr/sbin/swapon "$SWAP_PART"
 
 # Save paths for later
 echo "$ROOT_PART" > /tmp/enux-root
 echo "$EFI_PART" > /tmp/enux-efi
 echo "$SWAP_PART" > /tmp/enux-swap
 
-echo "Partitioning complete! Press ENTER to continue..."
-read
+echo "Partitioning complete!"
+read -p "Press ENTER to continue..."
