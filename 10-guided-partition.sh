@@ -1,21 +1,30 @@
 #!/bin/bash
-source /lib/ui.sh
+# Ensure flat repo: ui.sh in same folder
+source "$(dirname "$0")/ui.sh"
 
-echo "-----Guided Partitioning-----"
+echo "----- Guided Partitioning -----"
 
+# List available disks
 echo "Available disks:"
 lsblk -d -o NAME,SIZE
 echo ""
-read -p "Enter the disk to install ENux on (e.g. /dev/sda): " INSTALL_DISK
 
-# Check if disk exists
+read -p "Enter the disk to install ENux on (e.g., /dev/sda): " INSTALL_DISK
+
+# Validate disk
 if [ ! -b "$INSTALL_DISK" ]; then
-    echo "Error: $INSTALL_DISK is not a block device."
+    echo "Error: $INSTALL_DISK is not a valid block device."
     read -p "Press ENTER to exit."
     exit 1
 fi
 
-# Wipe the disk
+# Confirm before wiping
+read -p "Warning: $INSTALL_DISK will be completely erased! Type YES to continue: " CONFIRM
+if [ "$CONFIRM" != "YES" ]; then
+    echo "Aborting installation."
+    exit 1
+fi
+
 echo "Wiping $INSTALL_DISK..."
 wipefs -a "$INSTALL_DISK"
 parted -s "$INSTALL_DISK" mklabel gpt
@@ -41,16 +50,16 @@ parted -s "$INSTALL_DISK" mkpart primary ext4 ${ROOT_START}MiB 100%
 ROOT_PART="${INSTALL_DISK}3"
 
 # Format partitions
-[ "$EFI_PART" != "" ] && mkfs.fat -F32 "$EFI_PART"
+[ -n "$EFI_PART" ] && mkfs.fat -F32 "$EFI_PART"
 mkswap "$SWAP_PART"
 mkfs.ext4 "$ROOT_PART"
 
 # Mount partitions
 mount "$ROOT_PART" /mnt
-[ "$EFI_PART" != "" ] && mkdir -p /mnt/boot/efi && mount "$EFI_PART" /mnt/boot/efi
+[ -n "$EFI_PART" ] && mkdir -p /mnt/boot/efi && mount "$EFI_PART" /mnt/boot/efi
 swapon "$SWAP_PART"
 
-# Save for later
+# Save paths for later
 echo "$ROOT_PART" > /tmp/enux-root
 echo "$EFI_PART" > /tmp/enux-efi
 echo "$SWAP_PART" > /tmp/enux-swap
