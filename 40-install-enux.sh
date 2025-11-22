@@ -12,10 +12,14 @@ if ! command -v git &>/dev/null; then
     apt install -y git
 fi
 
-# Clone the repo into target system
-arch-chroot /mnt bash -c "
-git clone https://github.com/ENux‑Distro/ENux‑goodies.git /root/ENux‑goodies
-cd /root/ENux‑goodies
+mount --types proc /proc /mnt/proc
+mount --rbind /sys /mnt/sys
+mount --rbind /dev /mnt/dev
+mount --rbind /run /mnt/run
+
+chroot /mnt /bin/bash -c "
+git clone https://github.com/ENux-Distro/ENux-goodies.git /root/ENux-goodies
+cd /root/ENux-goodies
 bash phase0.sh
 "
 
