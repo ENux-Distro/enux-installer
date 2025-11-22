@@ -8,7 +8,6 @@ source "$BASE_DIR/ui.sh"
 source "$BASE_DIR/utils.sh"
 
 title "Welcome to ENux Installer"
-
 read -p "Press ENTER to start..."
 
 # Run all module scripts in order (flat structure)
@@ -18,4 +17,3 @@ done
 
 title "Installation complete!"
 echo "You can now reboot your system."
-
