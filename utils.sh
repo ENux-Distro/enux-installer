@@ -9,3 +9,4 @@ command_exists() {
 pause() {
     read -p "Press ENTER to continue..."
 }
+
