@@ -1,7 +1,7 @@
 #!/bin/bash
-source ../lib/ui.sh
+source /lib/ui.sh
 
-title "Installing ENux Scripts"
+echo "-----Installing ENux Scripts-----"
 
 echo "Cloning ENux‑goodies repository..."
 read -p "Press ENTER to continue..."
